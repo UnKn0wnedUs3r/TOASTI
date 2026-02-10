@@ -1,0 +1,228 @@
+{
+  "targets": [
+    {
+      "source_page": "http://127.0.0.1:8000/",
+      "url": "http://127.0.0.1:8000/search",
+      "method": "GET",
+      "params": [
+        "category",
+        "q"
+      ],
+      "hidden": {}
+    },
+    {
+      "source_page": "http://127.0.0.1:8000/",
+      "url": "http://127.0.0.1:8000/submit",
+      "method": "POST",
+      "params": [
+        "body",
+        "title"
+      ],
+      "hidden": {}
+    },
+    {
+      "source_page": "http://127.0.0.1:8000/page2.html",
+      "url": "http://127.0.0.1:8000/login",
+      "method": "POST",
+      "params": [
+        "password",
+        "username"
+      ],
+      "hidden": {}
+    }
+  ],
+  "reflection": [
+    {
+      "target": {
+        "source_page": "http://127.0.0.1:8000/",
+        "url": "http://127.0.0.1:8000/search",
+        "method": "GET",
+        "params": [
+          "category",
+          "q"
+        ],
+        "hidden": {}
+      },
+      "param": "category",
+      "marker": "toasti_5pjv0j43",
+      "baseline": {
+        "status": 404,
+        "elapsed": 0.0155,
+        "len": 460,
+        "final_url": "http://127.0.0.1:8000/search?category=test&q=test"
+      },
+      "mutated": {
+        "status": 404,
+        "elapsed": 0.0169,
+        "len": 460,
+        "final_url": "http://127.0.0.1:8000/search?category=toasti_5pjv0j43&q=test"
+      },
+      "evidence": {
+        "reflected": false,
+        "status_changed": false,
+        "len_delta": 0,
+        "time_delta": 0.0014
+      }
+    },
+    {
+      "target": {
+        "source_page": "http://127.0.0.1:8000/",
+        "url": "http://127.0.0.1:8000/search",
+        "method": "GET",
+        "params": [
+          "category",
+          "q"
+        ],
+        "hidden": {}
+      },
+      "param": "q",
+      "marker": "toasti_d6zar318",
+      "baseline": {
+        "status": 404,
+        "elapsed": 0.0155,
+        "len": 460,
+        "final_url": "http://127.0.0.1:8000/search?category=test&q=test"
+      },
+      "mutated": {
+        "status": 404,
+        "elapsed": 0.0389,
+        "len": 460,
+        "final_url": "http://127.0.0.1:8000/search?category=test&q=toasti_d6zar318"
+      },
+      "evidence": {
+        "reflected": false,
+        "status_changed": false,
+        "len_delta": 0,
+        "time_delta": 0.0233
+      }
+    },
+    {
+      "target": {
+        "source_page": "http://127.0.0.1:8000/",
+        "url": "http://127.0.0.1:8000/submit",
+        "method": "POST",
+        "params": [
+          "body",
+          "title"
+        ],
+        "hidden": {}
+      },
+      "param": "body",
+      "marker": "toasti_tzkmoj89",
+      "baseline": {
+        "status": 501,
+        "elapsed": 0.0149,
+        "len": 482,
+        "final_url": "http://127.0.0.1:8000/submit"
+      },
+      "mutated": {
+        "status": 501,
+        "elapsed": 0.0186,
+        "len": 482,
+        "final_url": "http://127.0.0.1:8000/submit"
+      },
+      "evidence": {
+        "reflected": false,
+        "status_changed": false,
+        "len_delta": 0,
+        "time_delta": 0.0037
+      }
+    },
+    {
+      "target": {
+        "source_page": "http://127.0.0.1:8000/",
+        "url": "http://127.0.0.1:8000/submit",
+        "method": "POST",
+        "params": [
+          "body",
+          "title"
+        ],
+        "hidden": {}
+      },
+      "param": "title",
+      "marker": "toasti_0xr5029u",
+      "baseline": {
+        "status": 501,
+        "elapsed": 0.0149,
+        "len": 482,
+        "final_url": "http://127.0.0.1:8000/submit"
+      },
+      "mutated": {
+        "status": 501,
+        "elapsed": 0.016,
+        "len": 482,
+        "final_url": "http://127.0.0.1:8000/submit"
+      },
+      "evidence": {
+        "reflected": false,
+        "status_changed": false,
+        "len_delta": 0,
+        "time_delta": 0.001
+      }
+    },
+    {
+      "target": {
+        "source_page": "http://127.0.0.1:8000/page2.html",
+        "url": "http://127.0.0.1:8000/login",
+        "method": "POST",
+        "params": [
+          "password",
+          "username"
+        ],
+        "hidden": {}
+      },
+      "param": "password",
+      "marker": "toasti_xpuynr8a",
+      "baseline": {
+        "status": 501,
+        "elapsed": 0.0159,
+        "len": 482,
+        "final_url": "http://127.0.0.1:8000/login"
+      },
+      "mutated": {
+        "status": 501,
+        "elapsed": 0.0162,
+        "len": 482,
+        "final_url": "http://127.0.0.1:8000/login"
+      },
+      "evidence": {
+        "reflected": false,
+        "status_changed": false,
+        "len_delta": 0,
+        "time_delta": 0.0002
+      }
+    },
+    {
+      "target": {
+        "source_page": "http://127.0.0.1:8000/page2.html",
+        "url": "http://127.0.0.1:8000/login",
+        "method": "POST",
+        "params": [
+          "password",
+          "username"
+        ],
+        "hidden": {}
+      },
+      "param": "username",
+      "marker": "toasti_jogoz7ta",
+      "baseline": {
+        "status": 501,
+        "elapsed": 0.0159,
+        "len": 482,
+        "final_url": "http://127.0.0.1:8000/login"
+      },
+      "mutated": {
+        "status": 501,
+        "elapsed": 0.0164,
+        "len": 482,
+        "final_url": "http://127.0.0.1:8000/login"
+      },
+      "evidence": {
+        "reflected": false,
+        "status_changed": false,
+        "len_delta": 0,
+        "time_delta": 0.0005
+      }
+    }
+  ]
+}
