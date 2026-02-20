@@ -1,355 +1,327 @@
+from __future__ import annotations
+
 import argparse
-import json
 import sys
-from typing import Any, Dict, List
+
+from tqdm import tqdm
 
 from core.http import HTTPClient
 from core.spider import crawl_site
-from core.targets import build_targets_from_forms_index, Target
-from core.auth import authenticate_form
+from core.targets import build_targets_from_forms_index
+from core.auth import perform_login
 
+# engines
 from engines.reflection import reflection_probe
 from engines.ssti_jinja2 import jinja2_ssti_scan
-from engines.os_injection import os_injection_scan
-
 from engines.ssti_twig import twig_ssti_scan
 from engines.ssti_freemarker import freemarker_ssti_scan
 from engines.ssti_velocity import velocity_ssti_scan
 from engines.ssti_mustache import mustache_ssti_scan
+from engines.os_injection import os_injection_scan
 
 
-def _parse_kv_list(items: List[str] | None) -> Dict[str, str]:
-    out: Dict[str, str] = {}
-    for it in items or []:
-        if "=" not in it:
-            raise ValueError(f"Expected key=value, got: {it}")
-        k, v = it.split("=", 1)
-        out[k.strip()] = v
-    return out
+# ============================================================
+# PRINT TARGETS
+# ============================================================
+
+def print_targets(targets):
+
+    print("\n========== TARGETS ==========\n")
+
+    for t in targets:
+
+        print(f"{t.method} {t.url} {t.params}")
+
+    print()
 
 
-def _print_targets(targets: List[Target]) -> None:
-    if not targets:
-        print("\n[!] No scan targets built (nothing to test).")
-        return
+# ============================================================
+# PRINT REFLECTION RESULTS
+# ============================================================
 
-    targets_sorted = sorted(targets, key=lambda t: (t.url, t.method, ",".join(t.params or []), t.source_page))
+def print_reflection(results):
 
-    print("\n========== Scan Targets (Unique Injection Points) ==========\n")
-    print(f"[+] Total unique targets: {len(targets_sorted)}\n")
+    print("\n========== Reflection ==========\n")
 
-    for t in targets_sorted:
-        params = t.params or []
-        params_str = ", ".join(params) if params else "(no params)"
-        src = t.source_page or ""
-        j = " JSON" if t.is_json else ""
-        hidden_str = f" hidden=[{', '.join(sorted(t.hidden.keys()))}]" if t.hidden else ""
+    for r in results:
 
-        print(f"- {t.method}{j}  {t.url}")
-        print(f"    params=[{params_str}]{hidden_str}")
-        if src:
-            print(f"    discovered_from={src}")
-        print()
+        url = r["target"]["url"]
+        param = r["param"]
 
-    print("===========================================================\n")
+        if r.get("reflected"):
 
+            result = "Reflected"
 
-def _print_reflection_findings(findings: List[Dict[str, Any]]) -> None:
-    if not findings:
-        print("[+] No reflected parameters found.")
-        return
+        else:
 
-    print("\n========== Reflection Findings ==========\n")
-    for r in findings:
-        t = r.get("target", {}) or {}
-        print("[!] Reflected parameter detected")
-        print(f"    URL: {t.get('url','')}")
-        print(f"    Method: {t.get('method','')}")
-        print(f"    Parameter: {r.get('param','')}\n")
-    print("=========================================\n")
+            result = "Not Reflected"
+
+        print(f"Target     : {url}")
+        print(f"Parameter  : {param}")
+        print(f"Result     : {result}")
+        print("----------------------------------------")
+
+    print()
 
 
-def _print_ssti_engine_summary(engine_name: str, results: List[Dict[str, Any]]) -> None:
-    if not results:
-        print(f"[+] No {engine_name} SSTI results (no targets/params).")
-        return
+# ============================================================
+# PRINT SSTI RESULTS
+# ============================================================
 
-    print(f"\n========== Toasti SSTI Summary ({engine_name}) ==========\n")
+def print_ssti(name, results):
 
-    results_sorted = sorted(
-        results,
-        key=lambda r: (
-            (r.get("target") or {}).get("url", ""),
-            (r.get("target") or {}).get("method", ""),
-            str(r.get("param", "")),
-        )
-    )
+    print(f"\n========== SSTI Summary ({name}) ==========\n")
 
-    vuln_count = 0
-    for r in results_sorted:
-        t = r.get("target", {}) or {}
-        verdict = r.get("verdict", {}) or {}
-        refl = (r.get("reflection_check") or {})
+    total = 0
+    vuln = 0
 
-        url = t.get("url", "")
-        method = t.get("method", "")
-        param = r.get("param", "")
+    for r in results:
 
-        reflected = (refl.get("reflected") is True)
-        pass_count = int(verdict.get("pass_count", 0) or 0)
-        probe_count = int(verdict.get("probe_count", 0) or 0)
-        confidence = int(verdict.get("confidence", 0) or 0)
-        vulnerable = (verdict.get("vulnerable") is True)
+        total += 1
 
-        if vulnerable:
-            vuln_count += 1
+        url = r["target"]["url"]
+        param = r["param"]
 
-        print(f"[+] Target: {url} ({method})")
-        print(f"    Param: {param}")
-        print(f"    Reflection: {'YES' if reflected else 'NO'}")
-        print(f"    {engine_name} probes: {pass_count}/{probe_count} passed")
-        print(f"    Confidence: {confidence}")
-        print(f"    Verdict: {'VULNERABLE' if vulnerable else 'Not vulnerable'}\n")
+        verdict = r["verdict"]["vulnerable"]
 
-    print(f"[+] Vulnerable findings: {vuln_count}/{len(results_sorted)}")
-    print("===============================================\n")
+        if verdict:
+
+            vuln += 1
+            result = "VULNERABLE"
+
+        else:
+
+            result = "Not Vulnerable"
+
+      
+
+        print(f"Target     : {url}")
+        print(f"Parameter  : {param}")
+        print(f"Result     : {result}")
+    
+        print("----------------------------------------")
+
+    print(f"\nSummary: {vuln} / {total} vulnerable\n")
 
 
-def _print_osinj_summary_neat(results: List[Dict[str, Any]]) -> None:
-    if not results:
-        print("[+] No OS-injection results (no targets/params).")
-        return
+# ============================================================
+# PROGRESS WRAPPER
+# ============================================================
 
-    print("\n========== Toasti OS Injection Summary ==========\n")
+def run_with_progress(label, func, client, targets):
 
-    results_sorted = sorted(
-        results,
-        key=lambda r: (
-            (r.get("target") or {}).get("url", ""),
-            (r.get("target") or {}).get("method", ""),
-            str(r.get("param", "")),
-        )
-    )
+    print(f"[+] Running {label}")
 
-    vuln_count = 0
-    for r in results_sorted:
-        t = r.get("target", {}) or {}
-        verdict = r.get("verdict", {}) or {}
+    results = []
 
-        url = t.get("url", "")
-        method = t.get("method", "")
-        param = r.get("param", "")
+    with tqdm(total=len(targets), desc=f"{label} Progress") as pbar:
 
-        pass_count = int(verdict.get("pass_count", 0) or 0)
-        probe_count = int(verdict.get("probe_count", 0) or 0)
-        confidence = int(verdict.get("confidence", 0) or 0)
-        vulnerable = (verdict.get("vulnerable") is True)
+        for t in targets:
 
-        if vulnerable:
-            vuln_count += 1
+            r = func(client, [t])
 
-        print(f"[+] Target: {url} ({method})")
-        print(f"    Param: {param}")
-        print(f"    OS probes: {pass_count}/{probe_count} passed")
-        print(f"    Confidence: {confidence}")
-        print(f"    Verdict: {'VULNERABLE' if vulnerable else 'Not vulnerable'}\n")
+            if r:
+                results.extend(r)
 
-    print(f"[+] Vulnerable findings: {vuln_count}/{len(results_sorted)}")
-    print("===============================================\n")
+            pbar.update(1)
+
+    return results
 
 
-def main() -> None:
-    p = argparse.ArgumentParser(prog="toasti")
+# ============================================================
+# MAIN
+# ============================================================
 
-    p.add_argument("-u", "--url", required=True, help="Target start URL")
-    p.add_argument("--depth", type=int, default=1, help="Crawl depth")
-    p.add_argument("--max-pages", type=int, default=50, help="Max pages to crawl")
+def main():
 
-    p.add_argument("--header", nargs="*", help="Headers key=value")
-    p.add_argument("--cookie", nargs="*", help="Cookies key=value")
-    p.add_argument("--timeout", type=int, default=15)
-    p.add_argument("--insecure", action="store_true", help="Disable TLS verification")
+    parser = argparse.ArgumentParser()
 
-    # Auth
-    p.add_argument("--login-url", default="", help="Login page URL")
-    p.add_argument("--user", default="", help="Username for login")
-    p.add_argument("--pass", dest="password", default="", help="Password for login")
-    p.add_argument("--user-field", default="", help="Override username field")
-    p.add_argument("--pass-field", default="", help="Override password field")
-    p.add_argument("--login-check-url", default="", help="Optional post-login check URL")
+    parser.add_argument("-u", "--url", required=True)
 
-    # Engines
-    p.add_argument("--reflect", action="store_true", help="Run reflection probe")
-    p.add_argument("--ssti-jinja2", action="store_true", help="Run Jinja2 SSTI detection")
-    p.add_argument("--ssti-twig", action="store_true", help="Run Twig SSTI detection (placeholders)")
-    p.add_argument("--ssti-freemarker", action="store_true", help="Run FreeMarker SSTI detection (placeholders)")
-    p.add_argument("--ssti-velocity", action="store_true", help="Run Velocity SSTI detection (placeholders)")
-    p.add_argument("--ssti-mustache", action="store_true", help="Run Mustache/Handlebars SSTI detection (placeholders)")
-    p.add_argument("--os-inject", action="store_true", help="Run OS command injection detection (scaffold)")
+    parser.add_argument("--depth", type=int, default=2)
 
-    # Visibility
-    p.add_argument("--show-targets", action="store_true", help="Print all unique scan targets (injection points)")
-    p.add_argument("--show-ssti-all", action="store_true", help="Print SSTI results for ALL tested params (neat summary)")
-    p.add_argument("--show-os-all", action="store_true", help="Print OS-injection results for ALL tested params (neat summary)")
+    parser.add_argument("--login-url")
+    parser.add_argument("--user")
+    parser.add_argument("--pass", dest="password")
 
-    # Output
-    p.add_argument("--json-out", default="", help="Write JSON output to file")
+    parser.add_argument("--show-targets", action="store_true")
 
-    args = p.parse_args()
+    parser.add_argument("--reflect", action="store_true")
 
-    if args.insecure:
-        try:
-            import urllib3
-            from urllib3.exceptions import InsecureRequestWarning
-            urllib3.disable_warnings(category=InsecureRequestWarning)
-        except Exception:
-            pass
+    parser.add_argument("--ssti-jinja2", action="store_true")
+    parser.add_argument("--ssti-twig", action="store_true")
+    parser.add_argument("--ssti-freemarker", action="store_true")
+    parser.add_argument("--ssti-velocity", action="store_true")
+    parser.add_argument("--ssti-mustache", action="store_true")
 
-    headers = _parse_kv_list(args.header)
-    cookies = _parse_kv_list(args.cookie)
+    parser.add_argument("--os-inject", action="store_true")
 
-    client = HTTPClient(headers=headers, cookies=cookies, timeout=args.timeout, verify_tls=not args.insecure)
+    args = parser.parse_args()
+
 
     print(f"[+] Starting Toasti against {args.url}")
 
-    # Login (optional)
-    if args.login_url:
-        if not args.user or not args.password:
-            print("[!] When using --login-url, you must provide --user and --pass")
-            sys.exit(1)
 
-        auth_res = authenticate_form(
-            client=client,
-            login_url=args.login_url,
-            username=args.user,
-            password=args.password,
-            user_field=args.user_field or None,
-            pass_field=args.pass_field or None,
-            check_url=args.login_check_url or None,
-            require_same_origin=True,
+    client = HTTPClient()
+
+
+    # LOGIN
+
+    if args.login_url:
+
+        print("[+] Attempting login...")
+
+        ok = perform_login(
+            client,
+            args.login_url,
+            args.user,
+            args.password,
         )
 
-        if auth_res.ok:
-            print(f"[+] Auth OK: {auth_res.reason}")
-        else:
-            print(f"[!] Auth FAILED: {auth_res.reason}")
-            return
+        if ok:
 
-    # Crawl
-    print("[+] Crawling target.")
-    crawl_result = crawl_site(
-        client=client,
-        start_url=args.url,
+            print("[+] Login success")
+
+        else:
+
+            print("[!] Login failed")
+            sys.exit(1)
+
+
+    # CRAWL
+
+    print("[+] Crawling target")
+
+    crawl = crawl_site(
+        client,
+        args.url,
         depth=args.depth,
-        max_pages=args.max_pages,
-        same_host_only=True,
     )
 
-    forms_index = crawl_result.get("forms_index", []) or []
-    api_endpoints = crawl_result.get("api_endpoints", []) or []
-    openapi_targets = crawl_result.get("openapi_targets", []) or []
-    query_urls = crawl_result.get("query_urls", []) or []
 
-    print(f"[+] Pages crawled: {crawl_result.get('pages_crawled', 0)}")
-    print(f"[+] Forms discovered: {len(forms_index)}")
-    print(f"[+] API endpoints discovered: {len(api_endpoints)}")
-    print(f"[+] Query URLs discovered: {len(query_urls)}")
+    # BUILD TARGETS
 
     targets = build_targets_from_forms_index(
-        forms_index=forms_index,
-        api_endpoints=api_endpoints,
-        openapi_targets=openapi_targets,
+
+        forms_index=crawl.get("forms_index"),
+
+        api_endpoints=crawl.get("api_endpoints"),
+
+        openapi_targets=crawl.get("openapi_targets"),
+
         base_url=args.url,
-        query_urls=query_urls,
+
+        query_urls=crawl.get("query_urls"),
+
     )
 
-    print(f"[+] Total scan targets built: {len(targets)}")
+
+    print(f"[+] Total targets: {len(targets)}")
+
 
     if args.show_targets:
-        _print_targets(targets)
 
-    out_blob: Dict[str, Any] = {
-        "start_url": args.url,
-        "crawl": crawl_result,
-        "targets": [t.to_dict() for t in targets],
-        "results": {}
-    }
+        print_targets(targets)
+
+
+    if not targets:
+
+        print("\n[!] No scan targets built.")
+
+
+    # REFLECTION
 
     if args.reflect:
-        print("[+] Running reflection scan.")
-        reflect_results = reflection_probe(client, targets)
-        out_blob["results"]["reflection"] = reflect_results
-        _print_reflection_findings(reflect_results)
 
-    # SSTI engines
+        results = run_with_progress(
+            "Reflection",
+            reflection_probe,
+            client,
+            targets
+        )
+
+        print_reflection(results)
+
+
+    # SSTI
+
     if args.ssti_jinja2:
-        print("[+] Running Jinja2 SSTI scan.")
-        res = jinja2_ssti_scan(client, targets)
-        out_blob["results"]["ssti_jinja2"] = res
-        if args.show_ssti_all:
-            _print_ssti_engine_summary("jinja2", res)
-        else:
-            vulns = [r for r in res if (r.get("verdict") or {}).get("vulnerable") is True]
-            _print_ssti_engine_summary("jinja2", vulns) if vulns else print("[+] No Jinja2 SSTI vulnerabilities detected.")
+
+        results = run_with_progress(
+            "Jinja2 SSTI",
+            jinja2_ssti_scan,
+            client,
+            targets
+        )
+
+        print_ssti("jinja2", results)
+
 
     if args.ssti_twig:
-        print("[+] Running Twig SSTI scan.")
-        res = twig_ssti_scan(client, targets)
-        out_blob["results"]["ssti_twig"] = res
-        if args.show_ssti_all:
-            _print_ssti_engine_summary("twig", res)
-        else:
-            vulns = [r for r in res if (r.get("verdict") or {}).get("vulnerable") is True]
-            _print_ssti_engine_summary("twig", vulns) if vulns else print("[+] No Twig SSTI vulnerabilities detected.")
+
+        results = run_with_progress(
+            "Twig SSTI",
+            twig_ssti_scan,
+            client,
+            targets
+        )
+
+        print_ssti("twig", results)
+
 
     if args.ssti_freemarker:
-        print("[+] Running FreeMarker SSTI scan.")
-        res = freemarker_ssti_scan(client, targets)
-        out_blob["results"]["ssti_freemarker"] = res
-        if args.show_ssti_all:
-            _print_ssti_engine_summary("freemarker", res)
-        else:
-            vulns = [r for r in res if (r.get("verdict") or {}).get("vulnerable") is True]
-            _print_ssti_engine_summary("freemarker", vulns) if vulns else print("[+] No FreeMarker SSTI vulnerabilities detected.")
+
+        results = run_with_progress(
+            "FreeMarker SSTI",
+            freemarker_ssti_scan,
+            client,
+            targets
+        )
+
+        print_ssti("freemarker", results)
+
 
     if args.ssti_velocity:
-        print("[+] Running Velocity SSTI scan.")
-        res = velocity_ssti_scan(client, targets)
-        out_blob["results"]["ssti_velocity"] = res
-        if args.show_ssti_all:
-            _print_ssti_engine_summary("velocity", res)
-        else:
-            vulns = [r for r in res if (r.get("verdict") or {}).get("vulnerable") is True]
-            _print_ssti_engine_summary("velocity", vulns) if vulns else print("[+] No Velocity SSTI vulnerabilities detected.")
+
+        results = run_with_progress(
+            "Velocity SSTI",
+            velocity_ssti_scan,
+            client,
+            targets
+        )
+
+        print_ssti("velocity", results)
+
 
     if args.ssti_mustache:
-        print("[+] Running Mustache SSTI scan.")
-        res = mustache_ssti_scan(client, targets)
-        out_blob["results"]["ssti_mustache"] = res
-        if args.show_ssti_all:
-            _print_ssti_engine_summary("mustache", res)
-        else:
-            vulns = [r for r in res if (r.get("verdict") or {}).get("vulnerable") is True]
-            _print_ssti_engine_summary("mustache", vulns) if vulns else print("[+] No Mustache SSTI vulnerabilities detected.")
 
-    # OS injection scaffold
+        results = run_with_progress(
+            "Mustache SSTI",
+            mustache_ssti_scan,
+            client,
+            targets
+        )
+
+        print_ssti("mustache", results)
+
+
     if args.os_inject:
-        print("[+] Running OS injection scan (scaffold).")
-        os_res = os_injection_scan(client, targets)
-        out_blob["results"]["os_injection"] = os_res
-        if args.show_os_all:
-            _print_osinj_summary_neat(os_res)
-        else:
-            vulns = [r for r in os_res if (r.get("verdict") or {}).get("vulnerable") is True]
-            _print_osinj_summary_neat(vulns) if vulns else print("[+] No OS injection vulnerabilities detected.")
 
-    if args.json_out:
-        with open(args.json_out, "w", encoding="utf-8") as f:
-            f.write(json.dumps(out_blob, indent=2))
-        print(f"[+] JSON written to {args.json_out}")
+        results = run_with_progress(
+            "OS Injection",
+            os_injection_scan,
+            client,
+            targets
+        )
 
-    print("[+] Scan complete.")
+        print_ssti("os injection", results)
 
+
+    print("[+] Scan complete")
+
+
+# ============================================================
 
 if __name__ == "__main__":
+
     main()

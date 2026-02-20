@@ -1,25 +1,25 @@
-from __future__ import annotations
-
-import os
 import random
+import re
 import string
-from typing import Any, Dict, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 
 from core.http import HTTPClient
 from core.targets import Target
 
 
-def _rand_token(n: int = 10) -> str:
+# ============================================================
+# Helpers
+# ============================================================
+
+def _rand_token(n: int = 8) -> str:
     return "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(n))
 
 
+def _rand_marker() -> str:
+    return "toasti_os_" + _rand_token(10)
+
+
 def _send_target(client: HTTPClient, t: Target, values: Dict[str, str]) -> Tuple[int, str, float, str]:
-    """
-    Target-aware sender:
-      - GET/DELETE -> query params
-      - POST/PUT/PATCH -> body (JSON if t.is_json else form)
-      - Always includes hidden fields (CSRF, etc) when present.
-    """
     method = (t.method or "GET").upper().strip()
 
     payload: Dict[str, Any] = {}
@@ -35,80 +35,136 @@ def _send_target(client: HTTPClient, t: Target, values: Dict[str, str]) -> Tuple
     return client.request(method, t.url, data=payload)
 
 
-def _make_osinj_probes(marker: str) -> List[Dict[str, str]]:
+_PRE_RE = re.compile(r"<pre[^>]*>(.*?)</pre>", re.IGNORECASE | re.DOTALL)
+
+
+def _extract_pre_text(html: str) -> Optional[str]:
     """
-    REAL (output-based) OS command injection probes (POSIX-style):
-
-    We avoid the classic false-positive trap "echo TOKEN" where TOKEN is literally in the payload
-    and can be reflected. Instead, we use arithmetic expansion so the *computed* result appears.
-
-    Payload example:
-      <marker>;echo TOASTI_OS_$((123*456))
-
-    Expected output in response (only if a shell evaluated it):
-      TOASTI_OS_56088
-
-    Return exactly 3 probes (semicolon, pipe, &&) for neat reporting.
+    If the page uses engine.html style output, command output is inside <pre>...</pre>.
+    We ONLY trust this region to avoid reflection false positives elsewhere in the HTML.
     """
-    prefix = "TOASTI_OS_"
-
-    a1, b1 = random.randint(101, 999), random.randint(101, 999)
-    a2, b2 = random.randint(101, 999), random.randint(101, 999)
-    a3, b3 = random.randint(2000, 9000), random.randint(10, 99)
-
-    expr1 = f"$(({a1}*{b1}))"
-    expr2 = f"$(({a2}+{b2}))"
-    expr3 = f"$(({a3}-{b3}))"
-
-    expected1 = f"{prefix}{a1*b1}"
-    expected2 = f"{prefix}{a2+b2}"
-    expected3 = f"{prefix}{a3-b3}"
-
-    # Note: marker prefix helps see "reach", but expected output must not be in payload.
-    return [
-        {"name": "semicolon_arith", "payload": f"{marker};echo {prefix}{expr1}", "expected": expected1, "raw_expr": expr1},
-        {"name": "pipe_arith",      "payload": f"{marker}|echo {prefix}{expr2}", "expected": expected2, "raw_expr": expr2},
-        {"name": "andand_arith",    "payload": f"{marker}&&echo {prefix}{expr3}", "expected": expected3, "raw_expr": expr3},
-    ]
+    if not html:
+        return None
+    m = _PRE_RE.search(html)
+    if not m:
+        return None
+    # Keep it simple: return raw inner text (may include HTML entities, that's fine for marker matching)
+    return m.group(1)
 
 
-def _pass_conditions(body: str, baseline_body: str, expected: str, raw_expr: str, payload: str) -> bool:
+def _baseline_region(b_body: str) -> str:
     """
-    PASS only if:
-      - expected computed output appears in response
-      - expected was not in baseline
-      - raw_expr is NOT present unchanged (helps reject pure reflection)
-      - payload is NOT present verbatim (helps reject pure reflection)
+    Region used for baseline comparison. Prefer <pre> if present, else whole body.
     """
-    body = body or ""
-    baseline_body = baseline_body or ""
+    pre = _extract_pre_text(b_body or "")
+    return pre if pre is not None else (b_body or "")
 
-    if expected not in body:
-        return False
-    if expected in baseline_body:
+
+def _response_region(s_body: str) -> str:
+    """
+    Region used for detection. Prefer <pre> if present, else whole body.
+    """
+    pre = _extract_pre_text(s_body or "")
+    return pre if pre is not None else (s_body or "")
+
+
+def _detect_exec(region: str, baseline_region: str, marker: str, payload: str) -> bool:
+    """
+    Robust execution detection to avoid reflection false positives.
+
+    We require:
+      - marker appears in the output region
+      - marker did NOT appear in baseline region
+      - the literal injection string ('echo <marker>') does NOT appear in output region
+      - the full payload does NOT appear verbatim in output region
+
+    Why:
+      Reflection often prints the payload itself. Real command output prints only the marker.
+    """
+    if not region:
         return False
 
-    # If the expression shows up unchanged, it likely wasn't evaluated.
-    if raw_expr in body:
+    if marker not in region:
         return False
 
-    # If the whole payload comes back unchanged, it's likely reflection.
-    if payload in body:
+    if baseline_region and marker in baseline_region:
+        return False
+
+    # If output region contains the literal injected command, it's likely just reflection / debug
+    # (In real command output, you'll see the marker, not "echo toasti_os_xxx")
+    if f"echo {marker}".lower() in region.lower():
+        return False
+
+    # If the output region contains the exact payload, also likely reflection
+    if payload and payload in region:
         return False
 
     return True
 
 
-def os_injection_scan(client: HTTPClient, targets: List[Target]) -> List[Dict[str, Any]]:
-    """
-    OS command injection detection (output-based):
+# ============================================================
+# Cross-platform probes (safe, marker-based)
+# ============================================================
 
-      For each (target, param):
-        1) baseline request
-        2) marker reflection check (helps confidence)
-        3) 3 probes (semicolon / pipe / &&) using arithmetic expansion
-        4) pass if computed output appears with anti-reflection guards
+def _make_probes(marker: str) -> List[Dict[str, str]]:
     """
+    We always include both Windows and Linux-style separators.
+    If ANY works, we flag vulnerable and record which family succeeded.
+
+    We use echo because it's common on Windows and Linux, and it produces deterministic output.
+    """
+    base = "127.0.0.1"
+
+    probes: List[Dict[str, str]] = []
+
+    # Windows-style chaining
+    probes.append({
+        "type": "win_amp",
+        "platform": "windows",
+        "payload": f"{base} & echo {marker}",
+        "expected_marker": marker,
+    })
+    probes.append({
+        "type": "win_and",
+        "platform": "windows",
+        "payload": f"{base} && echo {marker}",
+        "expected_marker": marker,
+    })
+    probes.append({
+        "type": "win_pipe",
+        "platform": "windows",
+        "payload": f"{base} | echo {marker}",
+        "expected_marker": marker,
+    })
+
+    # Linux/macOS-style chaining
+    probes.append({
+        "type": "lin_semicolon",
+        "platform": "linux",
+        "payload": f"{base}; echo {marker}",
+        "expected_marker": marker,
+    })
+    probes.append({
+        "type": "lin_and",
+        "platform": "linux",
+        "payload": f"{base} && echo {marker}",
+        "expected_marker": marker,
+    })
+    probes.append({
+        "type": "lin_pipe",
+        "platform": "linux",
+        "payload": f"{base} | echo {marker}",
+        "expected_marker": marker,
+    })
+
+    return probes
+
+
+# ============================================================
+# Main scan
+# ============================================================
+
+def os_injection_scan(client: HTTPClient, targets: List[Target]) -> List[Dict[str, Any]]:
     results: List[Dict[str, Any]] = []
 
     for t in targets:
@@ -122,91 +178,81 @@ def os_injection_scan(client: HTTPClient, targets: List[Target]) -> List[Dict[st
         except Exception:
             continue
 
+        baseline_region = _baseline_region(b_body or "")
+
         for p in params:
-            marker = "toasti_osinj_" + _rand_token(10)
+            marker = _rand_marker()
+            probes = _make_probes(marker)
 
-            # reflection/reach check
-            try:
-                r_status, r_body, _, r_url = _send_target(client, t, {p: marker})
-            except Exception:
-                continue
-
-            reflected = (marker in (r_body or "")) and (marker not in (b_body or ""))
-
-            probes = _make_osinj_probes(marker)
             probe_results: List[Dict[str, Any]] = []
             pass_count = 0
-            any_marker_present = False
+            detected_platforms = set()
 
             for pr in probes:
                 payload = pr["payload"]
-                expected = pr["expected"]
-                raw_expr = pr["raw_expr"]
+                platform = pr["platform"]
+                ptype = pr["type"]
 
                 try:
                     s_status, s_body, _, s_url = _send_target(client, t, {p: payload})
                 except Exception:
                     probe_results.append({
-                        "name": pr["name"],
+                        "type": ptype,
+                        "platform": platform,
                         "payload": payload,
-                        "expected": expected,
-                        "pass": False,
+                        "marker_present": False,
+                        "exec_present": False,
                         "status": 0,
                         "final_url": t.url,
                         "error": "probe_request_failed",
                     })
                     continue
 
-                marker_present = (marker in (s_body or "")) and (marker not in (b_body or ""))
-                any_marker_present = any_marker_present or marker_present
+                region = _response_region(s_body or "")
 
-                passed = _pass_conditions(
-                    body=s_body or "",
-                    baseline_body=b_body or "",
-                    expected=expected,
-                    raw_expr=raw_expr,
-                    payload=payload,
+                exec_present = _detect_exec(
+                    region=region,
+                    baseline_region=baseline_region,
+                    marker=marker,
+                    payload=payload
                 )
 
-                if passed:
+                if exec_present:
                     pass_count += 1
+                    detected_platforms.add(platform)
 
                 probe_results.append({
-                    "name": pr["name"],
+                    "type": ptype,
+                    "platform": platform,
                     "payload": payload,
-                    "expected": expected,
-                    "pass": passed,
+                    "marker_present": (marker in region),
+                    "exec_present": exec_present,
                     "status": s_status,
                     "final_url": s_url,
                 })
 
-            # verdict (conservative): at least 1 probe passes AND some sign input reaches response
-            vulnerable = (pass_count >= 1) and (reflected or any_marker_present)
-
+            # Confidence scoring (simple, stable)
             confidence = 0
-            if reflected:
-                confidence += 20
-            if any_marker_present:
-                confidence += 20
             if pass_count >= 1:
-                confidence += 60
+                confidence = 80
             if pass_count >= 2:
-                confidence += 10
-            if pass_count == 3:
-                confidence += 10
-            confidence = min(confidence, 100)
+                confidence = 90
+            if pass_count >= 3:
+                confidence = 100
+
+            vulnerable = (pass_count >= 1)
 
             results.append({
                 "target": t.to_dict(),
                 "param": p,
                 "baseline": {"status": b_status, "final_url": b_url, "len": len(b_body or "")},
-                "reflection_check": {"marker": marker, "reflected": reflected, "status": r_status, "final_url": r_url},
-                "osinj_probes": probe_results,
+                "os_probes": probe_results,
                 "verdict": {
                     "vulnerable": vulnerable,
                     "confidence": confidence,
                     "pass_count": pass_count,
                     "probe_count": len(probes),
+                    "detected_platforms": list(detected_platforms),
                 },
             })
 
