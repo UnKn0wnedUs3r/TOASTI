@@ -1,0 +1,133 @@
+[+] Starting Toasti against http://127.0.0.1:5000
+[+] Attempting login...
+[+] Attempting login...
+[+] Trying JSON login...
+[+] Trying HTML login...
+[+] Using fields: username / password
+[+] Login verified
+[+] Logged in via HTML
+[+] Login success
+[+] Crawling target
+[+] Total targets: 16
+
+========== TARGETS ==========
+
+GET http://127.0.0.1:5000/search ['category', 'q']
+POST http://127.0.0.1:5000/submit ['body', 'title']
+GET http://127.0.0.1:5000/preview/jinja2 ['input']
+GET http://127.0.0.1:5000/preview/twig ['input']
+GET http://127.0.0.1:5000/preview/freemarker ['input']
+GET http://127.0.0.1:5000/preview/velocity ['input']
+GET http://127.0.0.1:5000/preview/mustache ['input']
+GET http://127.0.0.1:5000/preview/os ['input']
+POST http://127.0.0.1:5000/login ['password', 'username']
+GET http://127.0.0.1:5000/ssti ['input']
+GET http://127.0.0.1:5000/twig ['input']
+GET http://127.0.0.1:5000/freemarker ['input']
+GET http://127.0.0.1:5000/velocity ['input']
+GET http://127.0.0.1:5000/mustache ['input']
+GET http://127.0.0.1:5000/os ['cmd']
+GET http://127.0.0.1:5000/blind_os ['cmd']
+
+[+] Running Mustache SSTI
+
+========== SSTI Summary (mustache) ==========
+
+Target: http://127.0.0.1:5000/mustache
+Parameter: input
+Result: VULNERABLE
+
+Engine: Mustache
+
+----------------------------------------
+
+Description:
+
+Mustache SSTI allows injection of template logic.
+
+Impact:
+
+Sensitive data exposure possible.
+
+Recommendation:
+
+Validate input.
+
+----------------------------------------
+VULNERABLE: 1 / 19
+
+Target: http://127.0.0.1:5000/search
+Parameter: category
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/search
+Parameter: q
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/submit
+Parameter: body
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/submit
+Parameter: title
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/jinja2
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/twig
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/freemarker
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/velocity
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/mustache
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/os
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/login
+Parameter: password
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/login
+Parameter: username
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/ssti
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/twig
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/freemarker
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/velocity
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/os
+Parameter: cmd
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/blind_os
+Parameter: cmd
+Result: Not Vulnerable
+
+NOT VULNERABLE: 18 / 19
+
+[+] Scan complete

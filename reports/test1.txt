@@ -1,0 +1,81 @@
+[+] Starting Toasti against http://127.0.0.1:5000
+[+] Crawling target
+[+] Total targets: 10
+[+] Running Jinja2 SSTI
+
+========== SSTI Summary (jinja2) ==========
+
+Target: http://127.0.0.1:5000/ssti
+Parameter: input
+Result: VULNERABLE
+
+Engine: Jinja2
+
+----------------------------------------
+
+Description:
+
+Server-Side Template Injection occurs when user input is embedded into templates and executed.
+
+Impact:
+
+Attackers can execute arbitrary code and fully compromise the server.
+
+Recommendation:
+
+Never render user input directly into templates.
+
+----------------------------------------
+VULNERABLE: 1 / 13
+
+Target: http://127.0.0.1:5000/search
+Parameter: category
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/search
+Parameter: q
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/submit
+Parameter: body
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/submit
+Parameter: title
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/jinja2
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/twig
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/freemarker
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/velocity
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/mustache
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/preview/os
+Parameter: input
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/login
+Parameter: password
+Result: Not Vulnerable
+
+Target: http://127.0.0.1:5000/login
+Parameter: username
+Result: Not Vulnerable
+
+NOT VULNERABLE: 12 / 13
+
+[+] Scan complete

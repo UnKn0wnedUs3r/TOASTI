@@ -1,0 +1,1229 @@
+[+] Starting Toasti against https://juice-shop.herokuapp.com
+[+] Crawling target
+[+] Total targets: 49
+
+========== TARGETS ==========
+
+GET https://juice-shop.herokuapp.com/api/Addresss ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/BasketItems ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Cards ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Challenges ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Challenges/?key=nftMintChallenge ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Complaints ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Deliverys ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Feedbacks ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Hints ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Products ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Quantitys ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Recycles ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/SecurityAnswers ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/SecurityQuestions ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/api/Users ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/2fa/disable ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/2fa/setup ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/2fa/status ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/2fa/verify ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/admin ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/basket/ ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/captcha ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/chatbot ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/continue-code ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/continue-code-findIt ['q', 'query', 'search', 'term', 'keyword', 'test']
+GET https://juice-shop.herokuapp.com/rest/continue-code-findIt/apply/ ['q', 'query', 'search', 'term', 'keyword', 'test']
+GET https://juice-shop.herokuapp.com/rest/continue-code-fixIt ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/continue-code-fixIt/apply/ ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/continue-code/apply/ ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/country-mapping ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/deluxe-membership ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/image-captcha/ ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/languages ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/memories ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/order-history ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/products ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/products/search?q= ['q', 'query', 'search', 'term', 'keyword', 'test']
+GET https://juice-shop.herokuapp.com/rest/repeat-notification ['q', 'search', 'id', 'page', 'limit', 'test']
+POST https://juice-shop.herokuapp.com/rest/saveLoginIp ['email', 'username', 'user', 'password', 'pass']
+GET https://juice-shop.herokuapp.com/rest/track-order ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/user ['q', 'search', 'id', 'page', 'limit', 'test']
+POST https://juice-shop.herokuapp.com/rest/user/authentication-details/ ['email', 'username', 'user', 'password', 'pass']
+GET https://juice-shop.herokuapp.com/rest/user/change-password?current= ['q', 'search', 'id', 'page', 'limit', 'test']
+POST https://juice-shop.herokuapp.com/rest/user/login ['email', 'username', 'user', 'password', 'pass']
+GET https://juice-shop.herokuapp.com/rest/user/reset-password ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/user/security-question?email= ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/user/whoami ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/wallet/balance ['q', 'search', 'id', 'page', 'limit', 'test']
+GET https://juice-shop.herokuapp.com/rest/web3 ['q', 'search', 'id', 'page', 'limit', 'test']
+
+[+] Running Jinja2 SSTI
+
+========== SSTI Summary (jinja2) ==========
+
+VULNERABLE: 0 / 291
+
+Target: https://juice-shop.herokuapp.com/api/Addresss
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Addresss
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Addresss
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Addresss
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Addresss
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Addresss
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/BasketItems
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/BasketItems
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/BasketItems
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/BasketItems
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/BasketItems
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/BasketItems
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Cards
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Cards
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Cards
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Cards
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Cards
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Cards
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges/?key=nftMintChallenge
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges/?key=nftMintChallenge
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges/?key=nftMintChallenge
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges/?key=nftMintChallenge
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges/?key=nftMintChallenge
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Challenges/?key=nftMintChallenge
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Complaints
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Complaints
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Complaints
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Complaints
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Complaints
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Complaints
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Deliverys
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Deliverys
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Deliverys
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Deliverys
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Deliverys
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Deliverys
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Feedbacks
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Feedbacks
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Feedbacks
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Feedbacks
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Feedbacks
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Feedbacks
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Hints
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Hints
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Hints
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Hints
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Hints
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Hints
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Products
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Products
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Products
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Products
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Products
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Products
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Quantitys
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Quantitys
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Quantitys
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Quantitys
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Quantitys
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Quantitys
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Recycles
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Recycles
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Recycles
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Recycles
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Recycles
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Recycles
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityAnswers
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityAnswers
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityAnswers
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityAnswers
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityAnswers
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityAnswers
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityQuestions
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityQuestions
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityQuestions
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityQuestions
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityQuestions
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/SecurityQuestions
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Users
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Users
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Users
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Users
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Users
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/api/Users
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/disable
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/disable
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/disable
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/disable
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/disable
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/disable
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/setup
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/setup
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/setup
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/setup
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/setup
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/setup
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/status
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/status
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/status
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/status
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/status
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/status
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/verify
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/verify
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/verify
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/verify
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/verify
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/2fa/verify
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/admin
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/admin
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/admin
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/admin
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/admin
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/admin
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/basket/
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/basket/
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/basket/
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/basket/
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/basket/
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/basket/
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/captcha
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/captcha
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/captcha
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/captcha
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/captcha
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/captcha
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/chatbot
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/chatbot
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/chatbot
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/chatbot
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/chatbot
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/chatbot
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt
+Parameter: query
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt
+Parameter: term
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt
+Parameter: keyword
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt/apply/
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt/apply/
+Parameter: query
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt/apply/
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt/apply/
+Parameter: term
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt/apply/
+Parameter: keyword
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-findIt/apply/
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt/apply/
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt/apply/
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt/apply/
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt/apply/
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt/apply/
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code-fixIt/apply/
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code/apply/
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code/apply/
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code/apply/
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code/apply/
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code/apply/
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/continue-code/apply/
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/country-mapping
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/country-mapping
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/country-mapping
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/country-mapping
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/country-mapping
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/country-mapping
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/deluxe-membership
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/deluxe-membership
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/deluxe-membership
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/deluxe-membership
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/deluxe-membership
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/deluxe-membership
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/image-captcha/
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/image-captcha/
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/image-captcha/
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/image-captcha/
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/image-captcha/
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/image-captcha/
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/languages
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/languages
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/languages
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/languages
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/languages
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/languages
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/memories
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/memories
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/memories
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/memories
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/memories
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/memories
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/order-history
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/order-history
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/order-history
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/order-history
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/order-history
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/order-history
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products/search?q=
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products/search?q=
+Parameter: query
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products/search?q=
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products/search?q=
+Parameter: term
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products/search?q=
+Parameter: keyword
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/products/search?q=
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/repeat-notification
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/repeat-notification
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/repeat-notification
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/repeat-notification
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/repeat-notification
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/repeat-notification
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/saveLoginIp
+Parameter: email
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/saveLoginIp
+Parameter: username
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/saveLoginIp
+Parameter: user
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/saveLoginIp
+Parameter: password
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/saveLoginIp
+Parameter: pass
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/track-order
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/track-order
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/track-order
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/track-order
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/track-order
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/track-order
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/authentication-details/
+Parameter: email
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/authentication-details/
+Parameter: username
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/authentication-details/
+Parameter: user
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/authentication-details/
+Parameter: password
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/authentication-details/
+Parameter: pass
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/change-password?current=
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/change-password?current=
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/change-password?current=
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/change-password?current=
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/change-password?current=
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/change-password?current=
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/login
+Parameter: email
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/login
+Parameter: username
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/login
+Parameter: user
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/login
+Parameter: password
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/login
+Parameter: pass
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/reset-password
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/reset-password
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/reset-password
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/reset-password
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/reset-password
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/reset-password
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/security-question?email=
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/security-question?email=
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/security-question?email=
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/security-question?email=
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/security-question?email=
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/security-question?email=
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/whoami
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/whoami
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/whoami
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/whoami
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/whoami
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/user/whoami
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/wallet/balance
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/wallet/balance
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/wallet/balance
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/wallet/balance
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/wallet/balance
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/wallet/balance
+Parameter: test
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/web3
+Parameter: q
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/web3
+Parameter: search
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/web3
+Parameter: id
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/web3
+Parameter: page
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/web3
+Parameter: limit
+Result: Not Vulnerable
+
+Target: https://juice-shop.herokuapp.com/rest/web3
+Parameter: test
+Result: Not Vulnerable
+
+NOT VULNERABLE: 291 / 291
+
+[+] Scan complete

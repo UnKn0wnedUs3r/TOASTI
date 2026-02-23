@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import os
 
 from tqdm import tqdm
 
@@ -18,6 +19,121 @@ from engines.ssti_freemarker import freemarker_ssti_scan
 from engines.ssti_velocity import velocity_ssti_scan
 from engines.ssti_mustache import mustache_ssti_scan
 from engines.os_injection import os_injection_scan
+
+
+# ============================================================
+# NEW FEATURE: OUTPUT TO TXT FILE (SAFE VERSION)
+# ============================================================
+
+class TeeOutput:
+
+    def __init__(self, filename):
+
+        os.makedirs("reports", exist_ok=True)
+
+        self.path = os.path.join("reports", filename)
+
+        self.file = open(self.path, "w", encoding="utf-8")
+
+        self.original_stdout = sys.stdout
+
+
+    def write(self, data):
+
+        self.original_stdout.write(data)
+        self.file.write(data)
+
+
+    def flush(self):
+
+        try:
+
+            self.original_stdout.flush()
+            self.file.flush()
+
+        except:
+
+            pass
+
+
+    def close(self):
+
+        try:
+
+            self.file.close()
+
+        except:
+
+            pass
+
+
+# ============================================================
+# SSTI DESCRIPTION DATABASE
+# ============================================================
+
+SSTI_INFO = {
+
+    "jinja2": {
+        "name": "Jinja2",
+        "description":
+        "Server-Side Template Injection occurs when user input is embedded into templates and executed.",
+        "impact":
+        "Attackers can execute arbitrary code and fully compromise the server.",
+        "fix":
+        "Never render user input directly into templates."
+    },
+
+    "twig": {
+        "name": "Twig",
+        "description":
+        "Twig SSTI allows execution of injected template expressions.",
+        "impact":
+        "Can lead to server compromise.",
+        "fix":
+        "Sanitize template input."
+    },
+
+    "freemarker": {
+        "name": "FreeMarker",
+        "description":
+        "FreeMarker SSTI executes injected template code.",
+        "impact":
+        "Remote code execution possible.",
+        "fix":
+        "Disable template execution."
+    },
+
+    "velocity": {
+        "name": "Velocity",
+        "description":
+        "Velocity SSTI allows execution of template expressions.",
+        "impact":
+        "Full system compromise.",
+        "fix":
+        "Do not embed user input."
+    },
+
+    "mustache": {
+        "name": "Mustache",
+        "description":
+        "Mustache SSTI allows injection of template logic.",
+        "impact":
+        "Sensitive data exposure possible.",
+        "fix":
+        "Validate input."
+    },
+
+    "os injection": {
+        "name": "OS Command Injection",
+        "description":
+        "OS Injection allows execution of system commands.",
+        "impact":
+        "Full server compromise.",
+        "fix":
+        "Never pass user input to system commands."
+    }
+
+}
 
 
 # ============================================================
@@ -48,13 +164,7 @@ def print_reflection(results):
         url = r["target"]["url"]
         param = r["param"]
 
-        if r.get("reflected"):
-
-            result = "Reflected"
-
-        else:
-
-            result = "Not Reflected"
+        result = "Reflected" if r.get("reflected") else "Not Reflected"
 
         print(f"Target     : {url}")
         print(f"Parameter  : {param}")
@@ -72,36 +182,66 @@ def print_ssti(name, results):
 
     print(f"\n========== SSTI Summary ({name}) ==========\n")
 
-    total = 0
-    vuln = 0
+    info = SSTI_INFO.get(name.lower())
+
+    vulnerable = []
+    not_vulnerable = []
 
     for r in results:
 
-        total += 1
+        if r["verdict"]["vulnerable"]:
+
+            vulnerable.append(r)
+
+        else:
+
+            not_vulnerable.append(r)
+
+    total = len(results)
+
+    for r in vulnerable:
 
         url = r["target"]["url"]
         param = r["param"]
 
-        verdict = r["verdict"]["vulnerable"]
+        print(f"Target: {url}")
+        print(f"Parameter: {param}")
+        print("Result: VULNERABLE")
 
-        if verdict:
+        if info:
 
-            vuln += 1
-            result = "VULNERABLE"
+            print()
+            print(f"Engine: {info['name']}")
 
-        else:
-
-            result = "Not Vulnerable"
-
-      
-
-        print(f"Target     : {url}")
-        print(f"Parameter  : {param}")
-        print(f"Result     : {result}")
-    
+        print()
         print("----------------------------------------")
 
-    print(f"\nSummary: {vuln} / {total} vulnerable\n")
+    if vulnerable and info:
+
+        print("\nDescription:\n")
+        print(info["description"])
+
+        print("\nImpact:\n")
+        print(info["impact"])
+
+        print("\nRecommendation:\n")
+        print(info["fix"])
+
+        print("\n----------------------------------------")
+
+    print(f"VULNERABLE: {len(vulnerable)} / {total}\n")
+
+    for r in not_vulnerable:
+
+        url = r["target"]["url"]
+        param = r["param"]
+
+        print(f"Target: {url}")
+        print(f"Parameter: {param}")
+        print("Result: Not Vulnerable")
+        print()
+
+    print(f"NOT VULNERABLE: {len(not_vulnerable)} / {total}\n")
 
 
 # ============================================================
@@ -121,6 +261,7 @@ def run_with_progress(label, func, client, targets):
             r = func(client, [t])
 
             if r:
+
                 results.extend(r)
 
             pbar.update(1)
@@ -144,6 +285,9 @@ def main():
     parser.add_argument("--user")
     parser.add_argument("--pass", dest="password")
 
+    # NEW OUTPUT ARGUMENT
+    parser.add_argument("--output", help="Save output to reports folder")
+
     parser.add_argument("--show-targets", action="store_true")
 
     parser.add_argument("--reflect", action="store_true")
@@ -159,8 +303,15 @@ def main():
     args = parser.parse_args()
 
 
-    print(f"[+] Starting Toasti against {args.url}")
+    tee = None
 
+    if args.output:
+
+        tee = TeeOutput(args.output)
+        sys.stdout = tee
+
+
+    print(f"[+] Starting Toasti against {args.url}")
 
     client = HTTPClient()
 
@@ -175,7 +326,7 @@ def main():
             client,
             args.login_url,
             args.user,
-            args.password,
+            args.password
         )
 
         if ok:
@@ -188,31 +339,21 @@ def main():
             sys.exit(1)
 
 
-    # CRAWL
-
     print("[+] Crawling target")
 
     crawl = crawl_site(
         client,
         args.url,
-        depth=args.depth,
+        depth=args.depth
     )
 
 
-    # BUILD TARGETS
-
     targets = build_targets_from_forms_index(
-
         forms_index=crawl.get("forms_index"),
-
         api_endpoints=crawl.get("api_endpoints"),
-
         openapi_targets=crawl.get("openapi_targets"),
-
         base_url=args.url,
-
-        query_urls=crawl.get("query_urls"),
-
+        query_urls=crawl.get("query_urls")
     )
 
 
@@ -223,13 +364,6 @@ def main():
 
         print_targets(targets)
 
-
-    if not targets:
-
-        print("\n[!] No scan targets built.")
-
-
-    # REFLECTION
 
     if args.reflect:
 
@@ -242,8 +376,6 @@ def main():
 
         print_reflection(results)
 
-
-    # SSTI
 
     if args.ssti_jinja2:
 
@@ -318,6 +450,14 @@ def main():
 
 
     print("[+] Scan complete")
+
+
+    if tee:
+
+        sys.stdout = tee.original_stdout
+        tee.close()
+
+        print(f"\n[+] Report saved to reports/{args.output}")
 
 
 # ============================================================

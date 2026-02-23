@@ -80,7 +80,7 @@ def _detect_pass_field(form):
 
 
 # ============================================================
-# JSON login attempt
+# JSON login attempt (UPDATED FOR JUICE SHOP)
 # ============================================================
 
 def _attempt_json_login(
@@ -130,6 +130,10 @@ def _attempt_json_login(
             return False, None
 
 
+        # ====================================================
+        # EXISTING TOKEN DETECTION (UNCHANGED)
+        # ====================================================
+
         for key in TOKEN_KEYS:
 
             if key in data:
@@ -147,6 +151,31 @@ def _attempt_json_login(
                 return True, final_url
 
 
+        # ====================================================
+        # NEW FIX: SUPPORT JUICE SHOP authentication.token
+        # ====================================================
+
+        if "authentication" in data:
+
+            auth = data.get("authentication")
+
+            if isinstance(auth, dict):
+
+                token = auth.get("token")
+
+                if token:
+
+                    print("[+] Token detected: authentication.token")
+
+                    client.session.headers.update({
+
+                        "Authorization": f"Bearer {token}"
+
+                    })
+
+                    return True, final_url
+
+
     except:
 
         pass
@@ -156,7 +185,7 @@ def _attempt_json_login(
 
 
 # ============================================================
-# HTML login attempt (FIXED VERSION)
+# HTML login attempt (UNCHANGED)
 # ============================================================
 
 def _attempt_html_login(
@@ -241,10 +270,7 @@ def _attempt_html_login(
     )
 
 
-    # ============================================================
-    # CRITICAL FIX: VERIFY LOGIN SUCCESS
-    # ============================================================
-
+    # VERIFY LOGIN
 
     status, verify_body, _, verify_url = client.request(
 
@@ -278,7 +304,7 @@ def _attempt_html_login(
 
 
 # ============================================================
-# MAIN LOGIN FUNCTION
+# MAIN LOGIN FUNCTION (UNCHANGED)
 # ============================================================
 
 def perform_login(
