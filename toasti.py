@@ -68,7 +68,7 @@ class TeeOutput:
 
 
 # ============================================================
-# SSTI DESCRIPTION DATABASE
+# SSTI & OS INJECTION DESCRIPTION DATABASE
 # ============================================================
 
 SSTI_INFO = {
@@ -76,61 +76,140 @@ SSTI_INFO = {
     "jinja2": {
         "name": "Jinja2",
         "description":
-        "Server-Side Template Injection occurs when user input is embedded into templates and executed.",
+        "Jinja2 Server-Side Template Injection (SSTI) occurs when user input is "
+        "embedded directly into a Jinja2 template and interpreted by the template "
+        "engine.\n\n"
+        "If the application fails to properly sanitize or escape the input, "
+        "attackers may inject template expressions such as {{...}} which are "
+        "executed during template rendering. Because Jinja2 integrates closely "
+        "with Python, attackers may gain access to internal objects, application "
+        "data, or system resources.",
+
         "impact":
-        "Attackers can execute arbitrary code and fully compromise the server.",
+        "Successful exploitation may allow attackers to execute arbitrary Python "
+        "code on the server.\n\n"
+        "Attackers could read sensitive files, access environment variables, "
+        "extract credentials, or manipulate application logic. In severe cases "
+        "this vulnerability can result in full system compromise.",
+
         "fix":
-        "Never render user input directly into templates."
+        "Avoid rendering raw user input directly inside templates.\n\n"
+        "Implement strict input validation and escaping mechanisms, and ensure "
+        "that template environments restrict access to sensitive objects or "
+        "functions."
     },
 
     "twig": {
         "name": "Twig",
         "description":
-        "Twig SSTI allows execution of injected template expressions.",
+        "Twig Server-Side Template Injection occurs when untrusted user input "
+        "is embedded into Twig templates and evaluated by the template engine.\n\n"
+        "Attackers may inject Twig expressions using {{...}} or {%...%} syntax, "
+        "which causes unintended logic to execute during template rendering.",
+
         "impact":
-        "Can lead to server compromise.",
+        "Exploitation may allow attackers to execute arbitrary template logic, "
+        "leading to data exposure or application manipulation.\n\n"
+        "In insecure configurations attackers may gain access to underlying PHP "
+        "functions or system resources.",
+
         "fix":
-        "Sanitize template input."
+        "Do not insert untrusted user input directly into Twig templates.\n\n"
+        "Apply strict input validation and consider enabling Twig sandbox mode "
+        "to restrict dangerous functionality."
     },
 
     "freemarker": {
         "name": "FreeMarker",
         "description":
-        "FreeMarker SSTI executes injected template code.",
+        "FreeMarker Server-Side Template Injection (SSTI) occurs when user input "
+        "is inserted directly into a FreeMarker template and evaluated by the "
+        "template engine.\n\n"
+        "If input is not properly sanitized, attackers can inject FreeMarker "
+        "expressions such as ${...} that the server processes during template "
+        "rendering. This allows malicious template code to execute within the "
+        "server environment and potentially access system objects, files, or "
+        "execute commands.",
+
         "impact":
-        "Remote code execution possible.",
+        "Successful exploitation can allow attackers to execute arbitrary code "
+        "on the server, read sensitive files, access environment variables, or "
+        "manipulate application data.\n\n"
+        "In severe cases this may lead to remote command execution or full "
+        "server compromise.",
+
         "fix":
-        "Disable template execution."
+        "Applications should avoid rendering user-controlled input directly "
+        "inside FreeMarker templates.\n\n"
+        "Input should be validated and escaped before processing. Developers "
+        "should also disable dangerous FreeMarker features such as unrestricted "
+        "access to Java classes and ensure secure template configurations."
     },
 
     "velocity": {
         "name": "Velocity",
         "description":
-        "Velocity SSTI allows execution of template expressions.",
+        "Velocity Server-Side Template Injection occurs when untrusted user "
+        "input is embedded into Apache Velocity templates and interpreted by "
+        "the template engine.\n\n"
+        "Attackers may inject Velocity expressions such as $variable or "
+        "#set directives which execute during template rendering.",
+
         "impact":
-        "Full system compromise.",
+        "Successful exploitation may allow attackers to access internal "
+        "application objects, execute arbitrary Java methods, or retrieve "
+        "sensitive information.\n\n"
+        "Depending on the environment configuration this could lead to remote "
+        "code execution or full server compromise.",
+
         "fix":
-        "Do not embed user input."
+        "Avoid embedding raw user input into Velocity templates.\n\n"
+        "Restrict the objects exposed to the template engine and implement "
+        "strict input validation to ensure only safe data is processed."
     },
 
     "mustache": {
         "name": "Mustache",
         "description":
-        "Mustache SSTI allows injection of template logic.",
+        "Mustache template injection occurs when user-controlled input is "
+        "inserted into Mustache templates without proper validation.\n\n"
+        "Although Mustache is designed as a logic-less template engine, "
+        "improper application implementation may still allow attackers to "
+        "manipulate template variables or expose unintended application data.",
+
         "impact":
-        "Sensitive data exposure possible.",
+        "Attackers may exploit this issue to expose sensitive application data "
+        "or manipulate rendered output.\n\n"
+        "While the risk is typically lower compared to other template engines, "
+        "insecure implementations may still lead to information disclosure.",
+
         "fix":
-        "Validate input."
+        "Ensure all user input is validated and properly escaped before being "
+        "rendered in templates.\n\n"
+        "Avoid exposing sensitive application objects or internal data within "
+        "template contexts."
     },
 
     "os injection": {
         "name": "OS Command Injection",
         "description":
-        "OS Injection allows execution of system commands.",
+        "OS Command Injection occurs when user-supplied input is passed "
+        "directly into system command execution functions without proper "
+        "validation or sanitization.\n\n"
+        "Applications that execute commands using functions such as system(), "
+        "exec(), or subprocess may allow attackers to inject additional "
+        "commands using operators like ;, &&, or |.",
+
         "impact":
-        "Full server compromise.",
+        "Successful exploitation allows attackers to execute arbitrary "
+        "operating system commands on the server.\n\n"
+        "This may lead to data exfiltration, privilege escalation, service "
+        "disruption, or full system compromise.",
+
         "fix":
-        "Never pass user input to system commands."
+        "Avoid executing system commands with unsanitized user input.\n\n"
+        "Use safe APIs or parameterized execution methods instead of shell "
+        "commands and implement strict input validation."
     }
 
 }
