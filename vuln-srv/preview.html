@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <body>
+    <h1>Preview Tool: {{ engine }}</h1>
+
+    <form method="GET">
+      <label>input:
+        <input name="input" style="width:760px" value="{{ payload }}">
+      </label>
+      <button type="submit">Render Preview</button>
+    </form>
+
+    <h2>Output</h2>
+    <pre>{{ output }}</pre>
+
+    <h3>Examples</h3>
+    {% if engine in ["jinja2", "twig"] %}
+      <ul>
+        <li><code>{{ "{{7*7}}" }}</code> → <code>49</code></li>
+        <li><code>{{ "{{'ab' ~ 'cd'}}" }}</code> → <code>abcd</code></li>
+        <li><code>{{ "{{'abc'|upper}}" }}</code> → <code>ABC</code></li>
+      </ul>
+    {% elif engine == "freemarker" %}
+      <ul>
+        <li><code>${"{7*7}"}</code> → <code>49</code></li>
+        <li><code>${"\"ab\" + \"cd\""}</code> → <code>abcd</code></li>
+        <li><code>${"\"abc\"?upper_case"}</code> → <code>ABC</code></li>
+      </ul>
+    {% elif engine == "velocity" %}
+      <ul>
+        <li><code>#set($x=7*7)$x</code> → <code>49</code></li>
+        <li><code>#set($s="ab" + "cd")$s</code> → <code>abcd</code></li>
+        <li><code>#set($t="abc")$t.toUpperCase()</code> → <code>ABC</code></li>
+      </ul>
+    {% elif engine == "mustache" %}
+      <ul>
+        <li><code>{{ "{{#if 1}}OK{{/if}}" }}</code> → <code>OK</code></li>
+        <li><code>{{ "{{#unless false}}OK{{/unless}}" }}</code> → <code>OK</code></li>
+        <li><code>{{ "{{#with 'abc'}}{{this}}{{/with}}" }}</code> → <code>abc</code></li>
+      </ul>
+    {% elif engine == "os" %}
+      <ul>
+        <li><code>echo $((7*7))</code> → <code>echo 49</code></li>
+        <li><code>TOASTI_OS_$((123*456))</code> → <code>TOASTI_OS_56088</code></li>
+      </ul>
+    {% endif %}
+
+    <p><a href="/">Back</a></p>
+  </body>
+</html>

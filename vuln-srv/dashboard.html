@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+
+<head>
+
+<title>Toasti Admin Dashboard</title>
+
+<style>
+
+body
+{
+    margin:0;
+    font-family:Arial;
+    background:#faf7f2;
+}
+
+
+header
+{
+    background:#8b4513;
+    color:white;
+    padding:20px;
+}
+
+
+.container
+{
+    padding:40px;
+}
+
+
+.card
+{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
+    box-shadow:0px 4px 10px rgba(0,0,0,0.1);
+}
+
+
+input
+{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+}
+
+
+button
+{
+    margin-top:10px;
+    padding:12px;
+    background:#8b4513;
+    color:white;
+    border:none;
+}
+
+
+pre
+{
+    background:black;
+    color:lime;
+    padding:15px;
+    border-radius:10px;
+    margin-top:15px;
+}
+
+</style>
+
+</head>
+
+
+
+<body>
+
+
+<header>
+
+<h1>Bakery Admin Panel 🍞</h1>
+
+</header>
+
+
+
+<div class="container">
+
+
+
+<div class="card">
+
+<h2>System Maintenance</h2>
+
+
+<p>
+
+Run bakery system command:
+
+</p>
+
+
+
+<!-- OS INJECTION VULNERABILITY HERE -->
+
+
+<form action="/os" method="GET">
+
+<input
+    name="cmd"
+    placeholder="Enter host or command"
+>
+
+<button>
+
+Run Command
+
+</button>
+
+</form>
+
+
+
+{% if output %}
+
+<h3>Command Output:</h3>
+
+<pre>
+
+{{ output }}
+
+</pre>
+
+{% endif %}
+
+
+</div>
+
+
+
+
+<div class="card">
+
+<h2>Inventory</h2>
+
+<ul>
+
+<li>Sourdough — 24 left</li>
+
+<li>Baguette — 18 left</li>
+
+<li>Brioche — 12 left</li>
+
+</ul>
+
+</div>
+
+
+
+<div class="card">
+
+<h2>Quick Links</h2>
+
+<a href="/">Home</a>
+
+</div>
+
+
+
+</div>
+
+
+
+</body>
+
+</html>

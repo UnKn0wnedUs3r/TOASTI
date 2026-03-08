@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+
+<head>
+
+<title>Bakery Admin Command Panel</title>
+
+<style>
+
+body
+{
+    margin:0;
+    font-family:Arial;
+    background:#faf7f2;
+}
+
+header
+{
+    background:#8b4513;
+    color:white;
+    padding:20px;
+}
+
+.container
+{
+    padding:40px;
+}
+
+.card
+{
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0px 4px 10px rgba(0,0,0,0.1);
+    width:600px;
+}
+
+input
+{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+}
+
+button
+{
+    margin-top:10px;
+    padding:12px;
+    background:#8b4513;
+    color:white;
+    border:none;
+    width:100%;
+}
+
+button:hover
+{
+    background:#5a2d0c;
+}
+
+pre
+{
+    background:black;
+    color:lime;
+    padding:15px;
+    margin-top:20px;
+    border-radius:10px;
+}
+
+</style>
+
+</head>
+
+
+
+<body>
+
+
+<header>
+
+<h1>Bakery System Command Panel 🍞</h1>
+
+</header>
+
+
+
+<div class="container">
+
+
+<div class="card">
+
+
+<h2>{{ engine }}</h2>
+
+
+<p>
+
+Run system command (Ping Tool):
+
+</p>
+
+
+<!-- IMPORTANT: USE GET METHOD -->
+
+
+<form method="GET" action="">
+
+<input
+    name="{{ field }}"
+    value="{{ payload }}"
+    placeholder="Enter command"
+>
+
+<button>
+
+Execute
+
+</button>
+
+</form>
+
+
+{% if output %}
+
+<h3>Output:</h3>
+
+<pre>
+
+{{ output }}
+
+</pre>
+
+{% endif %}
+
+
+
+</div>
+
+
+</div>
+
+
+</body>
+
+</html>

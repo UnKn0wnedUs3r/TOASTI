@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+
+<head>
+
+<title>Toasti Bread Reviews</title>
+
+<style>
+
+body
+{
+    font-family:Arial;
+    background:#faf7f2;
+    margin:0;
+}
+
+
+/* HEADER */
+
+header
+{
+    background:#8b4513;
+    color:white;
+    padding:20px;
+}
+
+
+/* MAIN */
+
+.container
+{
+    padding:40px;
+}
+
+
+/* FORM BOX */
+
+.box
+{
+    background:white;
+    padding:25px;
+    border-radius:10px;
+    box-shadow:0px 4px 12px rgba(0,0,0,0.1);
+    width:500px;
+}
+
+
+input, textarea, select
+{
+    width:100%;
+    padding:10px;
+    margin-top:10px;
+    border-radius:5px;
+    border:1px solid #ccc;
+}
+
+
+button
+{
+    margin-top:15px;
+    padding:12px;
+    background:#8b4513;
+    color:white;
+    border:none;
+    width:100%;
+    font-size:16px;
+    cursor:pointer;
+}
+
+
+button:hover
+{
+    background:#5a2d0c;
+}
+
+
+/* REVIEW CARD */
+
+.review
+{
+    margin-top:30px;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0px 4px 10px rgba(0,0,0,0.1);
+    width:500px;
+}
+
+
+.review img
+{
+    width:100%;
+    border-radius:10px;
+}
+
+
+.star
+{
+    color:gold;
+    font-size:20px;
+}
+
+
+</style>
+
+</head>
+
+
+
+<body>
+
+
+
+<header>
+
+<h1>Leave Bread Review 🥐</h1>
+
+</header>
+
+
+
+
+<div class="container">
+
+
+
+<div class="box">
+
+
+<form method="POST">
+
+
+Your Name:
+
+<input name="name" placeholder="Enter your name">
+
+
+Select Bread:
+
+
+<select name="bread">
+
+<option>Sourdough</option>
+
+<option>Baguette</option>
+
+<option>Brioche</option>
+
+<option>Croissant</option>
+
+</select>
+
+
+
+Rating:
+
+
+<select name="rating">
+
+<option>⭐</option>
+
+<option>⭐⭐</option>
+
+<option>⭐⭐⭐</option>
+
+<option>⭐⭐⭐⭐</option>
+
+<option>⭐⭐⭐⭐⭐</option>
+
+</select>
+
+
+
+Review Message:
+
+
+<textarea name="message" placeholder="Write your review..."></textarea>
+
+
+<button>
+
+Submit Review
+
+</button>
+
+
+</form>
+
+
+</div>
+
+
+
+
+
+<!-- KEEP REFLECTION VULNERABILITY -->
+
+
+{% if name %}
+
+
+<div class="review">
+
+
+<h2>Review Submitted ✅</h2>
+
+
+Bread:
+
+<b>{{ bread }}</b>
+
+
+<br><br>
+
+
+Rating:
+
+<span class="star">
+
+{{ rating }}
+
+</span>
+
+
+<br><br>
+
+
+Name:
+
+<b>
+
+{{ name }}
+
+</b>
+
+
+<br><br>
+
+
+Review:
+
+
+<p>
+
+{{ message }}
+
+</p>
+
+
+
+
+<!-- bread image -->
+
+<img src="https://images.unsplash.com/photo-1608198093002-ad4e005484ec">
+
+
+
+</div>
+
+
+{% endif %}
+
+
+
+</div>
+
+
+</body>
+
+</html>

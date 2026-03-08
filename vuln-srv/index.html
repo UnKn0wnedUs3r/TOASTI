@@ -1,0 +1,312 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Toasti Breads</title>
+
+<style>
+
+body
+{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#faf7f2;
+}
+
+/* HEADER */
+
+header
+{
+    background:#8b4513;
+    color:white;
+    padding:20px;
+}
+
+header h1
+{
+    margin:0;
+}
+
+nav a
+{
+    color:white;
+    margin-right:15px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+nav a:hover
+{
+    text-decoration:underline;
+}
+
+/* HERO */
+
+.hero
+{
+    height:350px;
+
+    background-image:url("https://images.unsplash.com/photo-1509440159596-0249088772ff");
+    background-size:cover;
+    background-position:center;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:white;
+    font-size:40px;
+    font-weight:bold;
+
+    text-shadow:2px 2px 8px black;
+}
+
+/* PRODUCTS */
+
+.container
+{
+    padding:40px;
+}
+
+.products
+{
+    display:flex;
+    gap:30px;
+}
+
+.card
+{
+    background:white;
+    border-radius:10px;
+    box-shadow:0px 4px 10px rgba(0,0,0,0.1);
+    overflow:hidden;
+    width:300px;
+}
+
+.card img
+{
+    width:100%;
+    height:200px;
+    object-fit:cover;
+}
+
+.card-body
+{
+    padding:15px;
+}
+
+.price
+{
+    color:green;
+    font-weight:bold;
+    font-size:18px;
+}
+
+/* BUTTON */
+
+button
+{
+    background:#8b4513;
+    color:white;
+    border:none;
+    padding:10px;
+    width:100%;
+    margin-top:10px;
+    cursor:pointer;
+}
+
+button:hover
+{
+    background:#5a2d0c;
+}
+
+/* LAB SECTION */
+
+.lab
+{
+    margin-top:50px;
+    padding:20px;
+    background:#eee;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+<h1>Toasti Bread Shop 🍞</h1>
+
+<nav>
+
+<a href="/">Home</a>
+<a href="/search">Search</a>
+<a href="/submit">Review</a>
+
+{% if session.get("logged_in") %}
+
+<a href="/dashboard">Dashboard</a>
+<a href="/logout">Logout</a>
+
+{% else %}
+
+<a href="/login">Login</a>
+
+{% endif %}
+
+</nav>
+
+</header>
+
+
+
+<div class="hero">
+
+Freshly Baked Bread Everyday
+
+</div>
+
+
+
+<div class="container">
+
+<h2>Our Popular Breads</h2>
+
+
+<div class="products">
+
+
+
+<div class="card">
+
+<img src="https://images.unsplash.com/photo-1608198093002-ad4e005484ec">
+
+<div class="card-body">
+
+<h3>Sourdough</h3>
+
+<p>Crispy and chewy traditional sourdough</p>
+
+<div class="price">$6.50</div>
+
+<button onclick="location.href='/submit'">
+
+Buy Now
+
+</button>
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<img src="https://images.unsplash.com/photo-1608198093002-ad4e005484ec">
+
+<div class="card-body">
+
+<h3>Baguette</h3>
+
+<p>Classic French bread</p>
+
+<div class="price">$3.40</div>
+
+<button onclick="location.href='/submit'">
+
+Buy Now
+
+</button>
+
+</div>
+
+</div>
+
+
+
+<div class="card">
+
+<img src="https://images.unsplash.com/photo-1608198093002-ad4e005484ec">
+
+<div class="card-body">
+
+<h3>Brioche</h3>
+
+<p>Soft sweet bread</p>
+
+<div class="price">$7.20</div>
+
+<button onclick="location.href='/submit'">
+
+Buy Now
+
+</button>
+
+</div>
+
+</div>
+
+
+</div>
+
+
+
+<!-- SEARCH FORM -->
+
+
+<h2 style="margin-top:40px;">Search Bread</h2>
+
+
+<form action="/search" method="GET">
+
+<input name="q" value="bread">
+
+<input name="category" value="all">
+
+<button>Search</button>
+
+</form>
+
+
+
+<!-- LAB SECTION — ONLY VISIBLE WHEN LOGGED IN -->
+
+
+{% if session.get("logged_in") %}
+
+<div class="lab">
+
+<h3>Lab Pages (Admin Only)</h3>
+
+<a href="/ssti">SSTI Jinja2</a><br>
+
+<a href="/twig">Twig</a><br>
+
+<a href="/freemarker">FreeMarker</a><br>
+
+<a href="/velocity">Velocity</a><br>
+
+<a href="/mustache">Mustache</a><br>
+
+<a href="/dashboard">Dashboard (OS Injection)</a><br>
+
+<a href="/blind_os">Blind OS Injection</a><br>
+
+</div>
+
+{% endif %}
+
+
+
+</div>
+
+
+
+</body>
+
+</html>

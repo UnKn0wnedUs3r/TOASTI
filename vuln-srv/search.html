@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+
+<title>Search Bread - Toasti</title>
+
+<style>
+
+body
+{
+    font-family:Arial;
+    background:#faf7f2;
+    margin:0;
+}
+
+header
+{
+    background:#8b4513;
+    color:white;
+    padding:20px;
+}
+
+.container
+{
+    padding:40px;
+}
+
+.search-box
+{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0px 4px 10px rgba(0,0,0,0.1);
+}
+
+input
+{
+    padding:10px;
+    margin:5px;
+}
+
+button
+{
+    padding:10px;
+    background:#8b4513;
+    color:white;
+    border:none;
+    cursor:pointer;
+}
+
+button:hover
+{
+    background:#5a2d0c;
+}
+
+.result
+{
+    margin-top:20px;
+    padding:20px;
+    background:white;
+    border-radius:10px;
+}
+
+img
+{
+    width:200px;
+    border-radius:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h1>Search Bread 🍞</h1>
+
+</header>
+
+
+<div class="container">
+
+
+<div class="search-box">
+
+<form method="GET">
+
+Search:
+
+<input name="q" value="{{ q }}">
+
+
+Category:
+
+<input name="category" value="{{ category }}">
+
+
+<button>Search</button>
+
+</form>
+
+</div>
+
+
+
+<div class="result">
+
+
+<h2>Search Result</h2>
+
+
+<!-- REFLECTION (KEEP FOR TOASTI) -->
+
+
+<p>You searched for:</p>
+
+<b>{{ q }}</b>
+
+<br><br>
+
+Category:
+
+<b>{{ category }}</b>
+
+
+<br><br>
+
+
+<img src="https://images.unsplash.com/photo-1608198093002-ad4e005484ec">
+
+
+</div>
+
+
+</div>
+
+
+</body>
+</html>
